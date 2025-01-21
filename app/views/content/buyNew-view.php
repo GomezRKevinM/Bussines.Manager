@@ -172,7 +172,7 @@
                 <div class="select mb-5">
                     <select name="compra_caja">
                         <?php
-                            $datos_cajas=$insLogin->seleccionarDatos("Normal","caja","*",0);
+                            $datos_cajas=$insLogin->seleccionarDatos("Normal","caja WHERE company_id=".$_SESSION['company'],"*",0);
 
                             while($campos_caja=$datos_cajas->fetch()){
                                 if($campos_caja['caja_id']==$_SESSION['caja']){
@@ -202,7 +202,7 @@
                 </div>
                 <?php 
                     }else{
-                        $datos_proveedor=$insLogin->seleccionarDatos("Normal","provedor WHERE supplier_id='1'","*",0);
+                        $datos_proveedor=$insLogin->seleccionarDatos("Normal","provedor WHERE company_id=".$_SESSION['company']." AND supplier_id='1'","*",0);
                         if($datos_proveedor->rowCount()==1){
                             $datos_proveedor=$datos_proveedor->fetch();
 

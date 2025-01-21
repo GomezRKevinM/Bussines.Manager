@@ -36,7 +36,7 @@
 				  	<select name="service_categoria" >
 				    	<option value="" selected="" >Seleccione una opción</option>
 				    	<?php
-                            $datos_categorias=$insLogin->seleccionarDatos("Normal","categoria","*",0);
+                            $datos_categorias=$insLogin->seleccionarDatos("Normal","categoria WHERE company_id=".$_SESSION['company'],"*",0);
 
                             $cc=1;
                             while($campos_categoria=$datos_categorias->fetch()){

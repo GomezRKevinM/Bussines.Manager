@@ -6,7 +6,7 @@
         .l_date{
             margin: 10px;
         }
-        span{
+        .spanText{
             color:#3f51b5;
             margin: 48px;
         }
@@ -30,7 +30,7 @@
                 <input type="hidden" name="modulo_buscador" value="buscar_fecha">
                 <input type="hidden" name="modulo_url" value="<?php echo $url[0]; ?>">
                 <div>
-                    <p><span>Desde:</span><span>Hasta:</span></p>
+                    <p><span class="spanText">Desde:</span><span class="spanText">Hasta:</span></p>
                 </div>
                 <div class="field is-grouped">
                     <p class="control is-expanded">

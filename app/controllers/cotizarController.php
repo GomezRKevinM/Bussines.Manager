@@ -10,6 +10,7 @@
 
             /*== Recuperando codigo de busqueda ==*/
 			$producto=$this->limpiarCadena($_POST['buscar_codigo']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando que no este vacio el campo ==*/
 			if($producto==""){
@@ -27,8 +28,8 @@
             }
 
             /*== Seleccionando productos en la DB ==*/
-            $datos_productos=$this->ejecutarConsulta("SELECT * FROM producto WHERE (producto_nombre LIKE '%$producto%' OR producto_marca LIKE '%$producto%' OR producto_modelo LIKE '%$producto%') ORDER BY producto_nombre ASC");
-			$datos_servicios=$this->ejecutarConsulta("SELECT * FROM servicio WHERE (servicio_nombre LIKE '%$producto%' ) ORDER BY servicio_nombre ASC");
+            $datos_productos=$this->ejecutarConsulta("SELECT * FROM producto WHERE (company_id=".$empresa.") AND (producto_nombre LIKE '%$producto%' OR producto_marca LIKE '%$producto%' OR producto_modelo LIKE '%$producto%') ORDER BY producto_nombre ASC");
+			$datos_servicios=$this->ejecutarConsulta("SELECT * FROM servicio WHERE (company_id=".$empresa.") AND (servicio_nombre LIKE '%$producto%' ) ORDER BY servicio_nombre ASC");
             if($datos_productos->rowCount()>=1){
 
 				$datos_productos=$datos_productos->fetchAll();
@@ -100,7 +101,7 @@
             }
 
             /*== Comprobando producto en la DB ==*/
-            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE company_id=".$empresa." AND producto_codigo='$codigo'");
             if($check_producto->rowCount()<=0){
                 $alerta=[
 					"tipo"=>"simple",
@@ -226,6 +227,7 @@
             /*== Recuperando codigo & cantidad del producto ==*/
             $codigo=$this->limpiarCadena($_POST['producto_codigo']);
             $cantidad=$this->limpiarCadena($_POST['producto_cantidad']);
+			$empresa=$_SESSION['company'];
 
             /*== comprobando campos vacios ==*/
             if($codigo=="" || $cantidad==""){
@@ -252,7 +254,7 @@
             }
 
             /*== Comprobando producto en la DB ==*/
-            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE company_id=".$empresa." AND producto_codigo='$codigo'");
             if($check_producto->rowCount()<=0){
                 $alerta=[
 					"tipo"=>"simple",
@@ -331,6 +333,7 @@
 
             /*== Recuperando termino de busqueda ==*/
 			$cliente=$this->limpiarCadena($_POST['buscar_cliente']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando que no este vacio el campo ==*/
 			if($cliente==""){
@@ -348,7 +351,7 @@
             }
 
             /*== Seleccionando clientes en la DB ==*/
-            $datos_cliente=$this->ejecutarConsulta("SELECT * FROM cliente WHERE (cliente_id!='1') AND (cliente_numero_documento LIKE '%$cliente%' OR cliente_nombre LIKE '%$cliente%' OR cliente_apellido LIKE '%$cliente%' OR cliente_telefono LIKE '%$cliente%') ORDER BY cliente_nombre ASC");
+            $datos_cliente=$this->ejecutarConsulta("SELECT * FROM cliente WHERE (company_id=".$empresa.") AND (cliente_numero_documento LIKE '%$cliente%' OR cliente_nombre LIKE '%$cliente%' OR cliente_apellido LIKE '%$cliente%' OR cliente_telefono LIKE '%$cliente%') ORDER BY cliente_nombre ASC");
 
             if($datos_cliente->rowCount()>=1){
 
@@ -390,9 +393,10 @@
 
             /*== Recuperando id del cliente ==*/
 			$id=$this->limpiarCadena($_POST['cliente_id']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando cliente en la DB ==*/
-			$check_cliente=$this->ejecutarConsulta("SELECT * FROM cliente WHERE cliente_id='$id'");
+			$check_cliente=$this->ejecutarConsulta("SELECT * FROM cliente WHERE company_id=".$empresa." AND cliente_id='$id'");
 			if($check_cliente->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -463,6 +467,7 @@
             $caja=$this->limpiarCadena($_POST['venta_caja']);
             $venta_pagado=$this->limpiarCadena($_POST['venta_abono']);
 			$detail=$this->limpiarCadena($_POST['detalles']);
+			$empresa=$_SESSION['company'];
 
             /*== Comprobando integridad de los datos ==*/
             if($this->verificarDatos("[0-9.]{1,25}",$venta_pagado)){
@@ -500,7 +505,7 @@
 
 
             /*== Comprobando cliente en la DB ==*/
-			$check_cliente=$this->ejecutarConsulta("SELECT cliente_id FROM cliente WHERE cliente_id='".$_SESSION['datos_cliente_venta']['cliente_id']."'");
+			$check_cliente=$this->ejecutarConsulta("SELECT cliente_id FROM cliente WHERE company_id=".$empresa." AND cliente_id='".$_SESSION['datos_cliente_venta']['cliente_id']."'");
 			if($check_cliente->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -514,7 +519,7 @@
 
 
             /*== Comprobando caja en la DB ==*/
-            $check_caja=$this->ejecutarConsulta("SELECT * FROM caja WHERE caja_id='$caja'");
+            $check_caja=$this->ejecutarConsulta("SELECT * FROM caja WHERE company_id=".$empresa." AND caja_id='$caja'");
 			if($check_caja->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -553,7 +558,7 @@
 			foreach($_SESSION['datos_producto_venta'] as $productos){
 
                 /*== Obteniendo datos del producto ==*/
-                $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_id='".$productos['producto_id']."' AND producto_codigo='".$productos['producto_codigo']."'");
+                $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE (company_id=".$empresa.") AND (producto_id='".$productos['producto_id']."' AND producto_codigo='".$productos['producto_codigo']."'");
                 if($check_producto->rowCount()<1){
                     $errores_productos=1;
                     break;
@@ -621,7 +626,7 @@
             }
 
             /*== generando codigo de cotizacion ==*/
-            $correlativo=$this->ejecutarConsulta("SELECT cotizacion_id FROM cotizaciones");
+            $correlativo=$this->ejecutarConsulta("SELECT cotizacion_id FROM cotizaciones WHERE company_id=".$empresa);
 			$correlativo=($correlativo->rowCount())+1;
             $codigo_venta=$this->generarCodigoAleatorio(10,$correlativo);
 
@@ -661,6 +666,11 @@
 					"campo_nombre"=>"caja_id",
 					"campo_marcador"=>":Caja",
 					"campo_valor"=>$caja
+				],
+				[
+					"campo_nombre"=>"company_id",
+					"campo_marcador"=>":Empresa",
+					"campo_valor"=>$empresa
 				]
             ];
 
@@ -864,6 +874,7 @@
 			$fechaF=$_SESSION['fechaF'];
 			$url=$this->limpiarCadena($url);
 			$url=APP_URL.$url."/";
+			$empresa=$_SESSION['company'];
 
 			$busqueda=$this->limpiarCadena($busqueda);
 
@@ -876,15 +887,15 @@
 
 			if(isset($busqueda) && $busqueda!=""){
 
-				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE cotizacion_fecha BETWEEN '$busqueda' AND '$fechaF' ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE (cotizaciones.company_id=".$empresa.") AND (cotizacion_fecha BETWEEN '$busqueda' AND '$fechaF') ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE cotizacion_fecha";
+				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE cotizaciones.company_id=".$empresa." AND cotizacion_fecha";
 
 			}else{
 
-				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id ORDER BY cotizaciones.venta_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE cotizaciones.company_id=".$empresa." ORDER BY cotizaciones.venta_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones";
+				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE cotizaciones.company_id=".$empresa;
 
 			}
 
@@ -902,7 +913,7 @@
 				<div class="table-container">
 				<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 					<thead>
-						<tr>
+						<tr class="is-primary">
 							<th class="has-text-centered">NRO.</th>
 							<th class="has-text-centered">Codigo</th>
 							<th class="has-text-centered">Fecha</th>
@@ -972,7 +983,7 @@
 					$tabla.='
 						<tr class="has-text-centered" >
 							<td colspan="7">
-								No hay ventas registradas en esta fecha en el sistema
+								🤨 No hay cotizaciones registradas en esta fecha en el sistema
 							</td>
 						</tr>
 					';
@@ -999,6 +1010,7 @@
 
 			$url=$this->limpiarCadena($url);
 			$url=APP_URL.$url."/";
+			$empresa=$_SESSION['company'];
 
 			$busqueda=$this->limpiarCadena($busqueda);
 			$tabla="";
@@ -1010,15 +1022,15 @@
 
 			if(isset($busqueda) && $busqueda!=""){
 
-				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE (cotizaciones.cotizacion_codigo='$busqueda') ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE (cotizaciones.company_id=".$empresa.") AND (cotizaciones.cotizacion_codigo='$busqueda') ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE (cotizaciones.cotizacion_codigo='$busqueda')";
+				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE (cotizaciones.company_id=".$empresa.") AND (cotizaciones.cotizacion_codigo='$busqueda')";
 
 			}else{
 
-				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM cotizaciones INNER JOIN cliente ON cotizaciones.cliente_id=cliente.cliente_id INNER JOIN usuario ON cotizaciones.usuario_id=usuario.usuario_id WHERE cotizaciones.company_id=".$empresa." ORDER BY cotizaciones.cotizacion_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones";
+				$consulta_total="SELECT COUNT(cotizacion_id) FROM cotizaciones WHERE cotizaciones.company_id=".$empresa;
 
 			}
 
@@ -1034,7 +1046,7 @@
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead>
-		                <tr>
+		                <tr class="is-primary">
 		                    <th class="has-text-centered">NRO.</th>
 		                    <th class="has-text-centered">Codigo</th>
 		                    <th class="has-text-centered">Fecha</th>
@@ -1104,7 +1116,7 @@
 					$tabla.='
 						<tr class="has-text-centered" >
 			                <td colspan="7">
-			                    No hay registros en el sistema
+			                    😒 No hay cotizaciones registradas en el sistema
 			                </td>
 			            </tr>
 					';
@@ -1128,6 +1140,7 @@
 		public function eliminarVentaControlador(){
 
 			$id=$this->limpiarCadena($_POST['venta_id']);
+			$empresa=$_SESSION['company'];
 
 			# Verificando Privilegios de Usuario #
 			if($_SESSION['rol']=="Empleado" || $_SESSION['rol']=="Cajero"){
@@ -1142,7 +1155,7 @@
 			}
 
 			# Verificando venta #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM cotizaciones WHERE cotizacion_id='$id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM cotizaciones WHERE company_id=".$empresa." AND cotizacion_id='$id'");
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -1157,7 +1170,7 @@
 		    }
 
 		    # Verificando detalles de cotización #
-		    $check_detalle_venta=$this->ejecutarConsulta("SELECT cotizacion_detalle_id FROM cotizacion_detalle WHERE cotizacion_codigo='".$datos['cotizacion_codigo']."'");
+		    $check_detalle_venta=$this->ejecutarConsulta("SELECT cotizacion_detalle_id FROM cotizacion_detalle WHERE company_id=".$empresa." AND cotizacion_codigo='".$datos['cotizacion_codigo']."'");
 		    $check_detalle_venta=$check_detalle_venta->rowCount();
 
 		    if($check_detalle_venta>0){

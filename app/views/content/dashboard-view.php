@@ -59,21 +59,21 @@ if($datos->rowCount()==1){
   	</div>
 </div>
 <?php
-	$total_cajas=$insLogin->seleccionarDatos("Normal","caja","caja_id",0);
+	$total_cajas=$insLogin->seleccionarDatos("Normal","caja WHERE company_id=".$_SESSION['company'],"caja_id",0);
 
-	$total_usuarios=$insLogin->seleccionarDatos("Normal","usuario WHERE usuario_id!='1' AND usuario_id!='".$_SESSION['id']."'","usuario_id",0);
+	$total_usuarios=$insLogin->seleccionarDatos("Normal","usuario WHERE company_id=".$_SESSION['company']." AND usuario_id!='".$_SESSION['id']."'","usuario_id",0);
 
-	$total_clientes=$insLogin->seleccionarDatos("Normal","cliente WHERE cliente_id!='1'","cliente_id",0);
+	$total_clientes=$insLogin->seleccionarDatos("Normal","cliente WHERE company_id=".$_SESSION['company'],"cliente_id",0);
 
-	$total_categorias=$insLogin->seleccionarDatos("Normal","categoria","categoria_id",0);
+	$total_categorias=$insLogin->seleccionarDatos("Normal","categoria WHERE company_id=".$_SESSION['company'],"categoria_id",0);
 
-	$total_productos=$insLogin->seleccionarDatos("Normal","producto","producto_id",0);
+	$total_productos=$insLogin->seleccionarDatos("Normal","producto WHERE company_id=".$_SESSION['company'],"producto_id",0);
 
-	$total_ventas=$insLogin->seleccionarDatos("Normal","venta","venta_id",0);
+	$total_ventas=$insLogin->seleccionarDatos("Normal","venta WHERE company_id=".$_SESSION['company'],"venta_id",0);
 
-	$total_cotizaciones=$insLogin->seleccionarDatos("Normal","cotizaciones","cotizacion_id",0);
+	$total_cotizaciones=$insLogin->seleccionarDatos("Normal","cotizaciones WHERE company_id=".$_SESSION['company'],"cotizacion_id",0);
 
-	$total_servicios=$insLogin->seleccionarDatos("Normal","servicios","venta_id",0);
+	$total_servicios=$insLogin->seleccionarDatos("Normal","servicios WHERE company_id=".$_SESSION['company'],"venta_id",0);
 
 if($_SESSION['rol']!=="Cajero"){?>
 

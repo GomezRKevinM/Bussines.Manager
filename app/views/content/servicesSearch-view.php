@@ -39,7 +39,7 @@
             </form>
         </div>
     </div>
-    <div class="container is-fluid mb-6"><i class="bi bi-archive-fill"></i> Productos:
+    <div class="container is-fluid mb-6"><i class="bi bi-archive-fill"></i> Servicios encontrados:
             <strong>
                 <span id="totalBar">
                 </span>

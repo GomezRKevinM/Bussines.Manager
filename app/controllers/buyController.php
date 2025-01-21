@@ -10,6 +10,7 @@
 
             /*== Recuperando codigo de busqueda ==*/
 			$producto=$this->limpiarCadena($_POST['buscar_codigo']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando que no este vacio el campo ==*/
 			if($producto==""){
@@ -27,7 +28,7 @@
             }
 
             /*== Seleccionando productos en la DB ==*/
-            $datos_productos=$this->ejecutarConsulta("SELECT * FROM producto WHERE (producto_nombre LIKE '%$producto%' OR producto_marca LIKE '%$producto%' OR producto_modelo LIKE '%$producto%') ORDER BY producto_nombre ASC");
+            $datos_productos=$this->ejecutarConsulta("SELECT * FROM producto WHERE company_id=".$empresa." AND (producto_nombre LIKE '%$producto%' OR producto_marca LIKE '%$producto%' OR producto_modelo LIKE '%$producto%') ORDER BY producto_nombre ASC");
 
             if($datos_productos->rowCount()>=1){
 
@@ -68,6 +69,7 @@
 
             /*== Recuperando codigo del producto ==*/
             $codigo=$this->limpiarCadena($_POST['producto_codigo']);
+			$empresa=$_SESSION['company'];
 
             if($codigo==""){
                 $alerta=[
@@ -93,7 +95,7 @@
             }
 
             /*== Comprobando producto en la DB ==*/
-            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE company_id=".$empresa." AND producto_codigo='$codigo'");
             if($check_producto->rowCount()<=0){
                 $alerta=[
 					"tipo"=>"simple",
@@ -207,6 +209,7 @@
             /*== Recuperando codigo & cantidad del producto ==*/
             $codigo=$this->limpiarCadena($_POST['producto_codigo']);
             $cantidad=$this->limpiarCadena($_POST['producto_cantidad']);
+			$empresa=$_SESSION['company'];
 
             /*== comprobando campos vacios ==*/
             if($codigo=="" || $cantidad==""){
@@ -233,7 +236,7 @@
             }
 
             /*== Comprobando producto en la DB ==*/
-            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+            $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE company_id=".$empresa." AND producto_codigo='$codigo'");
             if($check_producto->rowCount()<=0){
                 $alerta=[
 					"tipo"=>"simple",
@@ -311,6 +314,7 @@
 
             /*== Recuperando termino de busqueda ==*/
 			$proveedor=$this->limpiarCadena($_POST['buscar_supplier']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando que no este vacio el campo ==*/
 			if($proveedor==""){
@@ -328,7 +332,7 @@
             }
 
             /*== Seleccionando clientes en la DB ==*/
-            $datos_proveedor=$this->ejecutarConsulta("SELECT * FROM provedor WHERE (supplier_id!='1') AND (supplier_nombre LIKE '%$proveedor%' OR supplier_representante LIKE '%$proveedor%' OR supplier_telefono LIKE '%$proveedor%') ORDER BY supplier_nombre ASC");
+            $datos_proveedor=$this->ejecutarConsulta("SELECT * FROM provedor WHERE (company_id=".$empresa.") AND (supplier_nombre LIKE '%$proveedor%' OR supplier_representante LIKE '%$proveedor%' OR supplier_telefono LIKE '%$proveedor%') ORDER BY supplier_nombre ASC");
 
             if($datos_proveedor->rowCount()>=1){
 
@@ -369,9 +373,10 @@
 
             /*== Recuperando id del cliente ==*/
 			$id=$this->limpiarCadena($_POST['supplier_id']);
+			$empresa=$_SESSION['company'];
 
 			/*== Comprobando cliente en la DB ==*/
-			$check_supplier=$this->ejecutarConsulta("SELECT * FROM provedor WHERE supplier_id='$id'");
+			$check_supplier=$this->ejecutarConsulta("SELECT * FROM provedor WHERE company_id=".$empresa." AND supplier_id='$id'");
 			if($check_supplier->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -436,6 +441,7 @@
 
             $caja=$this->limpiarCadena($_POST['compra_caja']);
             $compra_pagado=$this->limpiarCadena($_POST['compra_abono']);
+			$empresa=$_SESSION['company'];
 
             /*== Comprobando integridad de los datos ==*/
             if($this->verificarDatos("[0-9.]{1,25}",$compra_pagado)){
@@ -473,7 +479,7 @@
 
 
             /*== Comprobando proveedor en la DB ==*/
-			$check_proveedor=$this->ejecutarConsulta("SELECT supplier_id FROM provedor WHERE supplier_id='".$_SESSION['datos_supplier_compra']['supplier_id']."'");
+			$check_proveedor=$this->ejecutarConsulta("SELECT supplier_id FROM provedor WHERE company_id=".$empresa." AND supplier_id='".$_SESSION['datos_supplier_compra']['supplier_id']."'");
 			if($check_proveedor->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -487,7 +493,7 @@
 
 
             /*== Comprobando caja en la DB ==*/
-            $check_caja=$this->ejecutarConsulta("SELECT * FROM caja WHERE caja_id='$caja'");
+            $check_caja=$this->ejecutarConsulta("SELECT * FROM caja WHERE company_id=".$empresa." AND caja_id='$caja'");
 			if($check_caja->rowCount()<=0){
 				$alerta=[
 					"tipo"=>"simple",
@@ -552,7 +558,7 @@
 			foreach($_SESSION['datos_producto_compra'] as $productos){
 
                 /*== Obteniendo datos del producto ==*/
-                $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE producto_id='".$productos['producto_id']."' AND producto_codigo='".$productos['producto_codigo']."'");
+                $check_producto=$this->ejecutarConsulta("SELECT * FROM producto WHERE (company_id=".$empresa.") AND (producto_id='".$productos['producto_id']."' AND producto_codigo='".$productos['producto_codigo']."')");
                 if($check_producto->rowCount()<1){
                     $errores_productos=1;
                     break;
@@ -620,7 +626,7 @@
             }
 
             /*== generando codigo de compra ==*/
-            $correlativo=$this->ejecutarConsulta("SELECT compra_id FROM compra");
+            $correlativo=$this->ejecutarConsulta("SELECT compra_id FROM compra WHERE company_id=".$empresa);
 			$correlativo=($correlativo->rowCount())+1;
             $codigo_compra=$this->generarCodigoAleatorio(10,$correlativo);
 
@@ -670,6 +676,11 @@
 					"campo_nombre"=>"caja_id",
 					"campo_marcador"=>":Caja",
 					"campo_valor"=>$caja
+				],
+				[
+					"campo_nombre"=>"company_id",
+					"campo_marcador"=>":Empresa",
+					"campo_valor"=>$empresa
 				]
             ];
 
@@ -873,6 +884,7 @@
 			$fechaF=$_SESSION['fechaF'];
 			$url=$this->limpiarCadena($url);
 			$url=APP_URL.$url."/";
+			$empresa=$_SESSION['company'];
 
 			$busqueda=$this->limpiarCadena($busqueda);
 
@@ -885,15 +897,15 @@
 
 			if(isset($busqueda) && $busqueda!=""){
 
-				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE compra_fecha BETWEEN '$busqueda' AND '$fechaF' ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE (compra.company_id=".$empresa.") AND (compra_fecha BETWEEN '$busqueda' AND '$fechaF') ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE compra_fecha";
+				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE compra.company_id=".$empresa." AND compra_fecha";
 
 			}else{
 
-				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE compra.company_id=".$empresa." ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(compra_id) FROM compra";
+				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE compra.company_id=".$empresa."";
 
 			}
 
@@ -910,7 +922,7 @@
 				<div class="table-container">
 				<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 					<thead>
-						<tr>
+						<tr class="is-primary">
 							<th class="has-text-centered">NRO.</th>
 							<th class="has-text-centered">Codigo</th>
 							<th class="has-text-centered">Fecha</th>
@@ -1007,6 +1019,7 @@
 
 			$url=$this->limpiarCadena($url);
 			$url=APP_URL.$url."/";
+			$empresa=$_SESSION['company'];
 
 			$busqueda=$this->limpiarCadena($busqueda);
 			$tabla="";
@@ -1018,15 +1031,15 @@
 
 			if(isset($busqueda) && $busqueda!=""){
 
-				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE (compra.compra_codigo='$busqueda') ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE compra.company_id=".$empresa." AND (compra.compra_codigo='$busqueda') ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE (compra.compra_codigo='$busqueda')";
+				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE compra.company_id=".$empresa." AND (compra.compra_codigo='$busqueda')";
 
 			}else{
 
-				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos_tablas FROM compra INNER JOIN provedor ON compra.supplier_id=provedor.supplier_id INNER JOIN usuario ON compra.usuario_id=usuario.usuario_id WHERE compra.company_id=".$empresa." ORDER BY compra.compra_id DESC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(compra_id) FROM compra";
+				$consulta_total="SELECT COUNT(compra_id) FROM compra WHERE compra.company_id=".$empresa."";
 
 			}
 
@@ -1042,7 +1055,7 @@
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead>
-		                <tr>
+		                <tr class="is-primary">
 		                    <th class="has-text-centered">NRO.</th>
 		                    <th class="has-text-centered">Codigo</th>
 		                    <th class="has-text-centered">Fecha</th>
@@ -1112,7 +1125,7 @@
 					$tabla.='
 						<tr class="has-text-centered" >
 			                <td colspan="7">
-			                    No hay registros en el sistema
+			                    😐 No hay registros de compras en el sistema
 			                </td>
 			            </tr>
 					';

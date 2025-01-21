@@ -198,7 +198,7 @@
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead>
-		                <tr>
+		                <tr class="is-primary">
 		                    <th class="has-text-centered">Numero</th>
 		                    <th class="has-text-centered">Nombre</th>
 		                    <th class="has-text-centered">Efectivo</th>
