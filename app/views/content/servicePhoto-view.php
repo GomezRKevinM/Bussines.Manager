@@ -36,7 +36,7 @@
 			</form>
 			<?php }else{ ?>
 			<figure class="image mb-6">
-			  	<img class="is-photo" id="preview" src="<?php echo APP_URL; ?>app/views/servicios/default.png">
+			  	<img class="is-photo" id="preview" src="<?php echo APP_URL; ?>app/views/servicios/default.jpg">
 			</figure>
 			<?php }?>
 		</div>

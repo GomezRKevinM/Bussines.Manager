@@ -9,6 +9,7 @@
 		public function registrarProductoControlador(){
 
 			# Almacenando datos#
+			$empresa=$_SESSION['company'];
 		    $codigo=$this->limpiarCadena($_POST['service_codigo']);
 		    $nombre=$this->limpiarCadena($_POST['service_nombre']);
 
@@ -64,7 +65,7 @@
 
 
 			# Verificando categoria #
-		    $check_categoria=$this->ejecutarConsulta("SELECT categoria_id FROM categoria WHERE categoria_id='$categoria'");
+		    $check_categoria=$this->ejecutarConsulta("SELECT categoria_id FROM categoria WHERE company_id=".$empresa." AND categoria_id='$categoria'");
 		    if($check_categoria->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -90,7 +91,7 @@
 			}
 
 			# Comprobando codigo de servicio #
-		    $check_codigo=$this->ejecutarConsulta("SELECT servicio_codigo FROM servicio WHERE servicio_codigo='$codigo'");
+		    $check_codigo=$this->ejecutarConsulta("SELECT servicio_codigo FROM servicio WHERE company_id=".$empresa." AND servicio_codigo='$codigo'");
 		    if($check_codigo->rowCount()>=1){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -103,7 +104,7 @@
 		    }
 
 		    # Comprobando nombre de servicio #
-		    $check_nombre=$this->ejecutarConsulta("SELECT servicio_nombre FROM servicio WHERE servicio_codigo='$codigo' AND servicio_nombre='$nombre'");
+		    $check_nombre=$this->ejecutarConsulta("SELECT servicio_nombre FROM servicio WHERE (company_id=".$empresa.") AND (servicio_codigo='$codigo' AND servicio_nombre='$nombre')");
 		    if($check_nombre->rowCount()>=1){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -225,6 +226,11 @@
 					"campo_nombre"=>"categoria_id",
 					"campo_marcador"=>":Categoria",
 					"campo_valor"=>$categoria
+				],
+				[
+					"campo_nombre"=>"company_id",
+					"campo_marcador"=>":Empresa",
+					"campo_valor"=>$empresa
 				]
 			];
 
@@ -262,6 +268,7 @@
 			$pagina=$this->limpiarCadena($pagina);
 			$registros=$this->limpiarCadena($registros);
 			$categoria=$this->limpiarCadena($categoria);
+			$empresa=$_SESSION['company'];
 
 			$url=$this->limpiarCadena($url);
 			if($categoria>0){
@@ -276,25 +283,25 @@
 			$pagina = (isset($pagina) && $pagina>0) ? (int) $pagina : 1;
 			$inicio = ($pagina>0) ? (($pagina * $registros)-$registros) : 0;
 
-			$campos="servicio.servicio_id,servicio.servicio_codigo,servicio.servicio_nombre,servicio.servicio_precio,servicio.servicio_foto,categoria.categoria_nombre";
+			$campos="servicio.company_id,servicio.servicio_id,servicio.servicio_codigo,servicio.servicio_nombre,servicio.servicio_precio,servicio.servicio_foto,categoria.categoria_nombre";
 
 			if(isset($busqueda) && $busqueda!=""){
 
-				$consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id WHERE servicio_codigo LIKE '%$busqueda%' OR servicio_nombre LIKE '%$busqueda%' ORDER BY servicio_nombre ASC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id WHERE (servicio.company_id=".$empresa.") AND (servicio_codigo LIKE '%$busqueda%' OR servicio_nombre LIKE '%$busqueda%') ORDER BY servicio_nombre ASC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(servicio_id) FROM servicio WHERE servicio_codigo LIKE '%$busqueda%' OR servicio_nombre LIKE '%$busqueda%'";
+				$consulta_total="SELECT COUNT(servicio_id) FROM servicio WHERE servicio.company_id=".$empresa." AND (servicio_codigo LIKE '%$busqueda%' OR servicio_nombre LIKE '%$busqueda%')";
 
 			}elseif($categoria>0){
 
-		        $consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id WHERE servicio.categoria_id='$categoria' ORDER BY servicio.servicio_nombre ASC LIMIT $inicio,$registros";
+		        $consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id WHERE servicio.company_id=".$empresa." AND servicio.categoria_id='$categoria' ORDER BY servicio.servicio_nombre ASC LIMIT $inicio,$registros";
 
-		        $consulta_total="SELECT COUNT(servicio_id) FROM servicio WHERE categoria_id='$categoria'";
+		        $consulta_total="SELECT COUNT(servicio_id) FROM servicio WHERE servicio.company_id=".$empresa." AND categoria_id='$categoria'";
 
 		    }else{
 
-				$consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id ORDER BY servicio_nombre ASC LIMIT $inicio,$registros";
+				$consulta_datos="SELECT $campos FROM servicio INNER JOIN categoria ON servicio.categoria_id=categoria.categoria_id WHERE servicio.company_id=".$empresa." ORDER BY servicio_nombre ASC LIMIT $inicio,$registros";
 
-				$consulta_total="SELECT COUNT(servicio_id) FROM servicio";
+				$consulta_total="SELECT COUNT(servicio_id) FROM servicio WHERE servicio.company_id=".$empresa;
 
 			}
 
@@ -465,9 +472,10 @@
 		public function actualizarProductoControlador(){
 
 			$id=$this->limpiarCadena($_POST['producto_id']);
+			$empresa=$_SESSION['company'];
 
 			# Verificando servicio #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM servicio WHERE servicio_id='$id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM servicio WHERE company_id=".$empresa." AND servicio_id='$id'");
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",
@@ -536,7 +544,7 @@
 
 			# Verificando categoria #
 			if($datos['categoria_id']!=$categoria){
-			    $check_categoria=$this->ejecutarConsulta("SELECT categoria_id FROM categoria WHERE categoria_id='$categoria'");
+			    $check_categoria=$this->ejecutarConsulta("SELECT categoria_id FROM categoria WHERE company_id=".$empresa." AND categoria_id='$categoria'");
 			    if($check_categoria->rowCount()<=0){
 			        $alerta=[
 						"tipo"=>"simple",
@@ -563,8 +571,8 @@
 			}
 
 			# Comprobando codigo de servicio #
-			if($datos['producto_codigo']!=$codigo){
-			    $check_codigo=$this->ejecutarConsulta("SELECT servicio_codigo FROM servicio WHERE servicio_codigo='$codigo'");
+			if($datos['servicio_codigo']!=$codigo){
+			    $check_codigo=$this->ejecutarConsulta("SELECT servicio_codigo FROM servicio WHERE company_id=".$empresa." AND servicio_codigo='$codigo'");
 			    if($check_codigo->rowCount()>=1){
 			        $alerta=[
 						"tipo"=>"simple",
@@ -579,7 +587,7 @@
 
 		    # Comprobando nombre de servicio #
 		    if($datos['servicio_nombre']!=$nombre){
-			    $check_nombre=$this->ejecutarConsulta("SELECT servicio_nombre FROM servicio WHERE servicio_codigo='$codigo' AND servicio_nombre='$nombre'");
+			    $check_nombre=$this->ejecutarConsulta("SELECT servicio_nombre FROM servicio WHERE (company_id=".$empresa.") AND (servicio_codigo='$codigo' AND servicio_nombre='$nombre')");
 			    if($check_nombre->rowCount()>=1){
 			        $alerta=[
 						"tipo"=>"simple",
@@ -730,9 +738,10 @@
 		public function actualizarFotoProductoControlador(){
 
 			$id=$this->limpiarCadena($_POST['producto_id']);
+			$empresa=$_SESSION['company'];
 
 			# Verificando producto #
-		    $datos=$this->ejecutarConsulta("SELECT * FROM servicio WHERE servicio_id='$id'");
+		    $datos=$this->ejecutarConsulta("SELECT * FROM servicio WHERE company_id=".$empresa." AND servicio_id='$id'");
 		    if($datos->rowCount()<=0){
 		        $alerta=[
 					"tipo"=>"simple",

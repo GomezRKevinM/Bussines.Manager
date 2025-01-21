@@ -863,7 +863,7 @@
 							</a>
 						</li> -->
 						<li class="full-width">
-							<a href="<?php echo APP_URL?>companyNew/" class="full-width">
+							<a href="<?php echo APP_URL."companyDetail/".$_SESSION['company']."/";?>" class="full-width">
 								<div class="navLateral-body-cl">
 									<i class="fas fa-store-alt fa-fw"></i>
 								</div>

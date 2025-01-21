@@ -8,7 +8,7 @@
 		/*----------  Controlador modulos de busquedas  ----------*/
 		public function modulosBusquedaControlador($modulo){
 
-			$listaModulos=['buySearch','buySearchDate','searchByItem','userSearch','cashierSearch','clientSearch','categorySearch','productSearch','saleSearch','saleSearchDate','cotizacionSearch','servicesSearchDate','serviceSearch','servicesSearchR','cotizacionSearchDate','searchDate'];
+			$listaModulos=['buySearch','buySearchDate','searchByItem','userSearch','cashierSearch','clientSearch','categorySearch','productSearch','saleSearch','saleSearchDate','cotizacionSearch','servicesSearchDate','servicesSearch','servicesSearchR','cotizacionSearchDate','searchDate'];
 
 			if(in_array($modulo, $listaModulos)){
 				return false;
